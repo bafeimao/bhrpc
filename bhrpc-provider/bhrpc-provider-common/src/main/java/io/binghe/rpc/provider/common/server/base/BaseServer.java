@@ -1,5 +1,7 @@
 package io.binghe.rpc.provider.common.server.base;
 
+import io.binghe.rpc.codec.RpcDecoder;
+import io.binghe.rpc.codec.RpcEncoder;
 import io.binghe.rpc.provider.common.handler.RpcProviderHandler;
 import io.binghe.rpc.provider.common.server.api.Server;
 import io.netty.bootstrap.ServerBootstrap;
@@ -54,8 +56,8 @@ public class BaseServer implements Server {
                             //todo 预留编解码，需要实现自定义协议
                             socketChannel
                                     .pipeline()
-                                    .addLast(new StringDecoder())
-                                    .addLast(new StringEncoder())
+                                    .addLast(new RpcDecoder())
+                                    .addLast(new RpcEncoder())
                                     .addLast(new RpcProviderHandler(handlerMap));
                         }
                     })
