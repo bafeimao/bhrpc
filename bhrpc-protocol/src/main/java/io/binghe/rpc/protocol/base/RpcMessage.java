@@ -9,27 +9,28 @@ public class RpcMessage implements Serializable {
     /**
      * 是否单向发送
      */
-    private boolean oneway;
+    private Boolean oneway;
 
     /**
      * 是否异步调用
      */
-    private boolean async;
+    private Boolean async;
 
-    public boolean isOneway() {
+
+    public Boolean getOneway() {
         return oneway;
     }
 
-    public RpcMessage setOneway(boolean oneway) {
+    public RpcMessage setOneway(Boolean oneway) {
         this.oneway = oneway;
         return this;
     }
 
-    public boolean isAsync() {
+    public Boolean getAsync() {
         return async;
     }
 
-    public RpcMessage setAsync(boolean async) {
+    public RpcMessage setAsync(Boolean async) {
         this.async = async;
         return this;
     }
