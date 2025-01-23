@@ -18,7 +18,7 @@ public @interface RpcService {
     /**
      * 接口的Class
      */
-    Class<?> interfactClass() default void.class;
+    Class<?> interfaceClass() default void.class;
 
     /**
      * 接口的ClassName
