@@ -39,6 +39,9 @@ public class RpcServiceScanner extends ClassScanner {
                     log.info(rpcService.interfaceClassName());
                     log.info("version===>>>" + rpcService.version());
                     log.info("group===>>>" + rpcService.group());
+                    String serviceName = rpcService.interfaceClass().getName();
+                    String key = serviceName.concat(rpcService.version()).concat(rpcService.group());
+                    handlerMap.put(key, clazz.newInstance());
                 }
             } catch (Exception e) {
                 log.error("scan classes throws exception:{}", e);
