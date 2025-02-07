@@ -1,7 +1,9 @@
 package io.binghe.rpc.provider.common.handler;
 
-import com.alibaba.fastjson2.JSONObject;
+import io.binghe.rpc.common.helper.RpcServiceHelper;
+import io.binghe.rpc.common.threadpool.ServerThreadPool;
 import io.binghe.rpc.protocol.RpcProtocol;
+import io.binghe.rpc.protocol.enumeration.RpcStatus;
 import io.binghe.rpc.protocol.enumeration.RpcType;
 import io.binghe.rpc.protocol.header.RpcHeader;
 import io.binghe.rpc.protocol.request.RpcRequest;
@@ -11,6 +13,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
@@ -26,22 +29,53 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocol<
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, RpcProtocol<RpcRequest> protocol) throws Exception {
-        log.info("RPC服务提供者接收到的数据====>>>>{}", JSONObject.toJSONString(protocol));
-        log.info("handlerMap存放的数据如下:");
-        handlerMap.forEach((k, v) -> {
-            log.info("key:{},value:{}", k, v);
+        ServerThreadPool.submit(() -> {
+            RpcHeader header = protocol.getHeader();
+            header.setMsgType((byte) RpcType.RESPONSE.getType());
+            RpcRequest request = protocol.getBody();
+            RpcProtocol<RpcResponse> responseProtocol = new RpcProtocol<>();
+            RpcResponse response = new RpcResponse();
+            try {
+                Object result = this.handle(request);
+                response.setResult(result);
+                response.setAsync(request.getAsync());
+                response.setOneway(request.getOneway());
+                header.setStatus((byte) RpcStatus.SUCCESS.getCode());
+            } catch (Throwable e) {
+                response.setError(e.toString());
+                header.setStatus((byte) RpcStatus.FAIL.getCode());
+            }
+            responseProtocol.setHeader(header);
+            responseProtocol.setBody(response);
+            channelHandlerContext.writeAndFlush(responseProtocol);
         });
-        RpcHeader header = protocol.getHeader();
-        RpcRequest request = protocol.getBody();
-        header.setMsgType((byte) RpcType.RESPONSE.getType());
-        RpcProtocol<RpcResponse> responseRpcProtocol = new RpcProtocol<>();
-        RpcResponse response = new RpcResponse();
-        response.setResult("数据交互成功");
-        response.setAsync(request.getAsync());
-        response.setOneway(request.getOneway());
-        responseRpcProtocol.setHeader(header);
-        responseRpcProtocol.setBody(response);
-        channelHandlerContext.writeAndFlush(responseRpcProtocol);
     }
 
+    private Object handle(RpcRequest request) throws Throwable {
+        String serviceKey = RpcServiceHelper.buildServiceKey(request.getClassName(), request.getVersion(), request.getGroup());
+        Object serviceBean = handlerMap.get(serviceKey);
+        if (serviceBean == null) {
+            throw new RuntimeException(String.format("service not exist: %s", serviceKey));
+        }
+        Class<?> serviceClass = serviceBean.getClass();
+        String methodName = request.getMethodName();
+        Class<?>[] parameterTypes = request.getParameterTypes();
+        Object[] parameters = request.getParameters();
+        return this.invokeMethod(serviceBean, serviceClass, methodName, parameterTypes, parameters);
+    }
+
+    private Object invokeMethod(Object serviceBean, Class<?> serviceClass, String methodName, Class<?>[] parameterType, Object[] parameters) throws Exception {
+        Method method = serviceClass.getMethod(methodName, parameterType);
+        if (method != null) {
+            method.setAccessible(true);
+            return method.invoke(serviceBean, parameters);
+        }
+        return null;
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        log.error("server caught exception", cause);
+        ctx.close();
+    }
 }

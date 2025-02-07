@@ -1,6 +1,7 @@
 package io.binghe.rpc.common.scanner.server;
 
 import io.binghe.rpc.annotation.RpcService;
+import io.binghe.rpc.common.helper.RpcServiceHelper;
 import io.binghe.rpc.common.scanner.ClassScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,16 +32,8 @@ public class RpcServiceScanner extends ClassScanner {
                 Class<?> clazz = Class.forName(className);
                 RpcService rpcService = clazz.getAnnotation(RpcService.class);
                 if (rpcService != null) {
-                    log.info("当前标注了@RpcService注解的类实例名称");
-                    log.info("@RpcService注解上标注的属性信息如下");
-                    log.info("interfaceClass=====>>>");
-                    log.info(rpcService.interfaceClass().getName());
-                    log.info("interfaceClassName");
-                    log.info(rpcService.interfaceClassName());
-                    log.info("version===>>>" + rpcService.version());
-                    log.info("group===>>>" + rpcService.group());
-                    String serviceName = rpcService.interfaceClass().getName();
-                    String key = serviceName.concat(rpcService.version()).concat(rpcService.group());
+                    String serviceName = getServiceName(rpcService);
+                    String key = RpcServiceHelper.buildServiceKey(serviceName, rpcService.version(), rpcService.group());
                     handlerMap.put(key, clazz.newInstance());
                 }
             } catch (Exception e) {
@@ -48,5 +41,17 @@ public class RpcServiceScanner extends ClassScanner {
             }
         });
         return handlerMap;
+    }
+
+    public static String getServiceName(RpcService rpcService) {
+        Class clazz = rpcService.interfaceClass();
+        if (clazz == void.class) {
+            return rpcService.interfaceClassName();
+        }
+        String serviceName = clazz.getName();
+        if (serviceName.trim().isEmpty()) {
+            serviceName = rpcService.interfaceClassName();
+        }
+        return serviceName;
     }
 }
