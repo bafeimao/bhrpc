@@ -70,7 +70,8 @@ public class ZookeeperRegistryService implements RegistryService {
     @Override
     public void unRegister(ServiceMeta serviceMeta) throws Exception {
         ServiceInstance<ServiceMeta> serviceInstance = ServiceInstance.<ServiceMeta>builder()
-                .name(serviceMeta.getServiceName())
+                .name(RpcServiceHelper.buildServiceKey(serviceMeta.getServiceName(),
+                        serviceMeta.getServiceVersion(), serviceMeta.getServiceGroup()))
                 .address(serviceMeta.getServiceAddr())
                 .port(serviceMeta.getServicePort())
                 .payload(serviceMeta)

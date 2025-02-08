@@ -1,5 +1,6 @@
 package io.binghe.rpc.test.registry;
 
+import io.binghe.rpc.common.helper.RpcServiceHelper;
 import io.binghe.rpc.protocol.meta.ServiceMeta;
 import io.binghe.rpc.registry.api.RegistryService;
 import io.binghe.rpc.registry.api.config.RegistryConfig;
@@ -16,7 +17,7 @@ public class ZookeeperRegistryTest {
 
     @Before
     public void init() throws Exception {
-        RegistryConfig registryConfig = new RegistryConfig("127.0.0.1:2181", "zookeeper");
+        RegistryConfig registryConfig = new RegistryConfig("127.0.0.1:3181", "zookeeper");
         this.registryService = new ZookeeperRegistryService();
         this.registryService.init(registryConfig);
         this.serviceMeta = new ServiceMeta(ZookeeperRegistryTest.class.getName(), "1.0.0",
@@ -36,7 +37,8 @@ public class ZookeeperRegistryTest {
 
     @Test
     public void testDiscovery() throws Exception {
-        ServiceMeta serviceMeta = registryService.discovery(ZookeeperRegistryTest.class.getName(), "binghe".hashCode());
+        ServiceMeta serviceMeta = registryService.discovery(RpcServiceHelper.buildServiceKey(ZookeeperRegistryTest.class.getName(),
+                "1.0.0", "binghe"), "binghe".hashCode());
         System.out.println(serviceMeta);
     }
 
