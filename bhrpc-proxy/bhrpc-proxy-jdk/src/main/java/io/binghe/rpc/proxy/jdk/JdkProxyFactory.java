@@ -1,5 +1,7 @@
 package io.binghe.rpc.proxy.jdk;
 
+import io.binghe.rpc.proxy.api.BaseProxyFactory;
+import io.binghe.rpc.proxy.api.ProxyFactory;
 import io.binghe.rpc.proxy.api.consumer.Consumer;
 import io.binghe.rpc.proxy.api.object.ObjectProxy;
 
@@ -8,7 +10,7 @@ import java.lang.reflect.Proxy;
 /**
  * @author You Chuande
  */
-public class JdkProxyFactory<T> {
+public class JdkProxyFactory<T> extends BaseProxyFactory<T> implements ProxyFactory {
 
     /**
      * 服务版本号
@@ -44,6 +46,9 @@ public class JdkProxyFactory<T> {
      */
     private boolean oneway;
 
+    public JdkProxyFactory() {
+    }
+
     public JdkProxyFactory(String serviceVersion, String serviceGroup, String serializeType, long timeout, Consumer consumer, boolean async, boolean oneway) {
         this.serviceVersion = serviceVersion;
         this.serviceGroup = serviceGroup;
@@ -55,11 +60,13 @@ public class JdkProxyFactory<T> {
     }
 
     @SuppressWarnings("unchecked")
-    public T getProxy(Class<T> clazz) {
+    @Override
+    public <T> T getProxy(Class<T> clazz) {
         return (T) Proxy.newProxyInstance(
                 clazz.getClassLoader(),
                 new Class<?>[]{clazz},
                 new ObjectProxy<T>(clazz, serviceVersion, serviceGroup, serializeType, timeout, consumer, async, oneway)
         );
     }
+
 }
