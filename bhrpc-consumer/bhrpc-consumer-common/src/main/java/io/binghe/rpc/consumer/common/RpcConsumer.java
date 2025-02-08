@@ -1,5 +1,6 @@
 package io.binghe.rpc.consumer.common;
 
+import io.binghe.rpc.common.threadpool.ClientThreadPool;
 import io.binghe.rpc.consumer.common.future.RPCFuture;
 import io.binghe.rpc.consumer.common.handler.RpcConsumerHandler;
 import io.binghe.rpc.consumer.common.initializer.RpcConsumerInitializer;
@@ -50,6 +51,7 @@ public class RpcConsumer {
 
     public void close() {
         eventLoopGroup.shutdownGracefully();
+        ClientThreadPool.shutdown();;
     }
 
     public RPCFuture sendRequest(RpcProtocol<RpcRequest> protocol) throws Exception {
