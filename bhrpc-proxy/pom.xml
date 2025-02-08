@@ -5,16 +5,15 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>io.binghe.rpc</groupId>
-        <artifactId>bhrpc-test</artifactId>
+        <artifactId>bhrpc</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>bhrpc-test-comsumer</artifactId>
+    <artifactId>bhrpc-proxy</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>bhrpc-test-consumer-codec</module>
-        <module>bhrpc-test-consumer-handler</module>
-        <module>bhrpc-test-consumer-native</module>
+        <module>bhrpc-proxy-api</module>
+        <module>bhrpc-proxy-jdk</module>
     </modules>
 
     <properties>

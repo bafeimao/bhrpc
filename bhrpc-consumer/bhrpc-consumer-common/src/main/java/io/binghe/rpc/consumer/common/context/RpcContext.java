@@ -1,6 +1,7 @@
 package io.binghe.rpc.consumer.common.context;
 
-import io.binghe.rpc.consumer.common.future.RPCFuture;
+
+import io.binghe.rpc.proxy.api.future.RPCFuture;
 
 /**
  * @author You Chuande

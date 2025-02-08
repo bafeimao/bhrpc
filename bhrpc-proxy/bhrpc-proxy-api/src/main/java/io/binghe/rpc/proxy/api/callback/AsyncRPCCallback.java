@@ -1,4 +1,4 @@
-package io.binghe.rpc.consumer.common.callback;
+package io.binghe.rpc.proxy.api.callback;
 
 /**
  * @author You Chuande

@@ -1,11 +1,12 @@
 package io.binghe.rpc.consumer.common;
 
 import io.binghe.rpc.common.threadpool.ClientThreadPool;
-import io.binghe.rpc.consumer.common.future.RPCFuture;
 import io.binghe.rpc.consumer.common.handler.RpcConsumerHandler;
 import io.binghe.rpc.consumer.common.initializer.RpcConsumerInitializer;
 import io.binghe.rpc.protocol.RpcProtocol;
 import io.binghe.rpc.protocol.request.RpcRequest;
+import io.binghe.rpc.proxy.api.consumer.Consumer;
+import io.binghe.rpc.proxy.api.future.RPCFuture;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -21,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author You Chuande
  */
-public class RpcConsumer {
+public class RpcConsumer implements Consumer {
     private final Logger log = LoggerFactory.getLogger(RpcConsumer.class);
     private final Bootstrap bootstrap;
     private final EventLoopGroup eventLoopGroup;
@@ -54,6 +55,7 @@ public class RpcConsumer {
         ClientThreadPool.shutdown();;
     }
 
+    @Override
     public RPCFuture sendRequest(RpcProtocol<RpcRequest> protocol) throws Exception {
         String serviceAddress = "127.0.0.1";
         int port = 27880;

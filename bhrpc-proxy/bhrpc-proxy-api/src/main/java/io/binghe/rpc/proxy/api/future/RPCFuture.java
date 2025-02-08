@@ -1,15 +1,14 @@
-package io.binghe.rpc.consumer.common.future;
+package io.binghe.rpc.proxy.api.future;
 
 
 import io.binghe.rpc.common.threadpool.ClientThreadPool;
-import io.binghe.rpc.consumer.common.callback.AsyncRPCCallback;
 import io.binghe.rpc.protocol.RpcProtocol;
 import io.binghe.rpc.protocol.request.RpcRequest;
 import io.binghe.rpc.protocol.response.RpcResponse;
+import io.binghe.rpc.proxy.api.callback.AsyncRPCCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.AbstractQueue;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
