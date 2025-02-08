@@ -1,6 +1,8 @@
 package io.binghe.rpc.consumer;
 
 import io.binghe.rpc.consumer.common.RpcConsumer;
+import io.binghe.rpc.proxy.api.async.IAsyncObjectProxy;
+import io.binghe.rpc.proxy.api.object.ObjectProxy;
 import io.binghe.rpc.proxy.jdk.JdkProxyFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +56,11 @@ public class RpcClient {
         JdkProxyFactory<T> jdkProxyFactory = new JdkProxyFactory<>(
                 serviceVersion, serviceGroup, serializationType, timeout, RpcConsumer.getInstance(), async, oneway);
         return jdkProxyFactory.getProxy(interfaceClass);
+    }
+
+    public <T> IAsyncObjectProxy createAsync(Class<T> interfaceClass) {
+        return new ObjectProxy<T>(interfaceClass, serviceVersion, serviceGroup,
+                serializationType, timeout, RpcConsumer.getInstance(), async, oneway);
     }
 
     public void shutdown() {
