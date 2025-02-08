@@ -7,17 +7,10 @@
         <groupId>io.binghe.rpc</groupId>
         <artifactId>bhrpc</artifactId>
         <version>1.0-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>bhrpc-test</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>bhrpc-test-provider</module>
-        <module>bhrpc-test-scanner</module>
-        <module>bhrpc-test-comsumer</module>
-        <module>bhrpc-test-api</module>
-        <module>bhrpc-test-registry</module>
-    </modules>
+    <artifactId>bhrpc-registry-api</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -28,13 +21,8 @@
     <dependencies>
         <dependency>
             <groupId>io.binghe.rpc</groupId>
-            <artifactId>bhrpc-common</artifactId>
+            <artifactId>bhrpc-protocol</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.2</version>
         </dependency>
     </dependencies>
 
