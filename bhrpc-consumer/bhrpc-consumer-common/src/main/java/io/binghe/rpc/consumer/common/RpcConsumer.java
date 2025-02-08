@@ -1,5 +1,6 @@
 package io.binghe.rpc.consumer.common;
 
+import io.binghe.rpc.consumer.common.future.RPCFuture;
 import io.binghe.rpc.consumer.common.handler.RpcConsumerHandler;
 import io.binghe.rpc.consumer.common.initializer.RpcConsumerInitializer;
 import io.binghe.rpc.protocol.RpcProtocol;
@@ -51,7 +52,7 @@ public class RpcConsumer {
         eventLoopGroup.shutdownGracefully();
     }
 
-    public Object sendRequest(RpcProtocol<RpcRequest> protocol) throws Exception {
+    public RPCFuture sendRequest(RpcProtocol<RpcRequest> protocol) throws Exception {
         String serviceAddress = "127.0.0.1";
         int port = 27880;
         String key = serviceAddress.concat("_").concat(String.valueOf(port));

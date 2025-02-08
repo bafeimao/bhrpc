@@ -1,6 +1,7 @@
 package io.binghe.rpc.test.consumer.handler;
 
 import io.binghe.rpc.consumer.common.RpcConsumer;
+import io.binghe.rpc.consumer.common.future.RPCFuture;
 import io.binghe.rpc.protocol.RpcProtocol;
 import io.binghe.rpc.protocol.header.RpcHeaderFactory;
 import io.binghe.rpc.protocol.request.RpcRequest;
@@ -15,8 +16,8 @@ public class RpcConsumerHandlerTest {
 
     public static void main(String[] args) throws Exception {
         RpcConsumer consumer = RpcConsumer.getInstance();
-        Object result = consumer.sendRequest(getRpcRequestProtocol());
-        log.info("从服务消费者获取到的数据为===>>>{}", result.toString());
+        RPCFuture result = consumer.sendRequest(getRpcRequestProtocol());
+        log.info("从服务消费者获取到的数据为===>>>{}", result.get());
         consumer.close();
     }
 
