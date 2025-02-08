@@ -4,15 +4,19 @@ import io.binghe.rpc.consumer.common.RpcConsumer;
 import io.binghe.rpc.protocol.RpcProtocol;
 import io.binghe.rpc.protocol.header.RpcHeaderFactory;
 import io.binghe.rpc.protocol.request.RpcRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author You Chuande
  */
 public class RpcConsumerHandlerTest {
+    private static final Logger log = LoggerFactory.getLogger(RpcConsumerHandlerTest.class);
+
     public static void main(String[] args) throws Exception {
         RpcConsumer consumer = RpcConsumer.getInstance();
-        consumer.sendRequest(getRpcRequestProtocol());
-        Thread.sleep(2000);
+        Object result = consumer.sendRequest(getRpcRequestProtocol());
+        log.info("从服务消费者获取到的数据为===>>>{}", result.toString());
         consumer.close();
     }
 
