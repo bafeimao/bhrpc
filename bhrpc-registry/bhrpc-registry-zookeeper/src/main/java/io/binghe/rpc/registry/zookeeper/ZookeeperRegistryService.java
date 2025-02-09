@@ -1,6 +1,8 @@
 package io.binghe.rpc.registry.zookeeper;
 
 import io.binghe.rpc.common.helper.RpcServiceHelper;
+import io.binghe.rpc.loadbalancer.api.ServiceLoadBalancer;
+import io.binghe.rpc.loadbalancer.random.RandomServiceLoadBalancer;
 import io.binghe.rpc.protocol.meta.ServiceMeta;
 import io.binghe.rpc.registry.api.RegistryService;
 import io.binghe.rpc.registry.api.config.RegistryConfig;
@@ -26,6 +28,7 @@ public class ZookeeperRegistryService implements RegistryService {
     public static final int MAX_RETRIES = 3;
     public static final String ZK_BASE_PATH = "/binghe-rpc";
     private ServiceDiscovery<ServiceMeta> serviceDiscovery;
+    private ServiceLoadBalancer<ServiceInstance<ServiceMeta>> serviceLoadBalancer;
 
     @Override
     public void init(RegistryConfig registryConfig) throws Exception {
@@ -39,6 +42,7 @@ public class ZookeeperRegistryService implements RegistryService {
                 .serializer(serializer)
                 .build();
         this.serviceDiscovery.start();
+        this.serviceLoadBalancer = new RandomServiceLoadBalancer<>();
     }
 
     @Override
@@ -51,20 +55,11 @@ public class ZookeeperRegistryService implements RegistryService {
         Collection<ServiceInstance<ServiceMeta>> serviceInstances =
                 serviceDiscovery.queryForInstances(serviceName);
         ServiceInstance<ServiceMeta> instance =
-                this.selectOneServiceInstance((List<ServiceInstance<ServiceMeta>>) serviceInstances);
+                serviceLoadBalancer.select((List<ServiceInstance<ServiceMeta>>) serviceInstances,invokeHashCode);
         if (instance != null) {
             return instance.getPayload();
         }
         return null;
-    }
-
-    private ServiceInstance<ServiceMeta> selectOneServiceInstance(List<ServiceInstance<ServiceMeta>> serviceInstances) {
-        if (serviceInstances == null || serviceInstances.isEmpty()) {
-            return null;
-        }
-        Random random = new Random();
-        int index = random.nextInt(serviceInstances.size());
-        return serviceInstances.get(index);
     }
 
     @Override
