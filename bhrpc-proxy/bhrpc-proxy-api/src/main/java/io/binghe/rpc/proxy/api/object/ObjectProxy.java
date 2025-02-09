@@ -6,6 +6,7 @@ import io.binghe.rpc.protocol.request.RpcRequest;
 import io.binghe.rpc.proxy.api.async.IAsyncObjectProxy;
 import io.binghe.rpc.proxy.api.consumer.Consumer;
 import io.binghe.rpc.proxy.api.future.RPCFuture;
+import io.binghe.rpc.registry.api.RegistryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,16 +59,19 @@ public class ObjectProxy<T> implements InvocationHandler, IAsyncObjectProxy {
      */
     private boolean oneway;
 
+    private RegistryService registryService;
+
     public ObjectProxy(Class<T> clazz) {
         this.clazz = clazz;
     }
 
     public ObjectProxy(Class<T> clazz, String serviceVersion, String serviceGroup, String serializeType, long timeout,
-                       Consumer consumer, boolean async, boolean oneway) {
+                       RegistryService registryService,Consumer consumer, boolean async, boolean oneway) {
         this.clazz = clazz;
         this.serviceVersion = serviceVersion;
         this.serviceGroup = serviceGroup;
         this.timeout = timeout;
+        this.registryService = registryService;
         this.consumer = consumer;
         this.serializeType = serializeType;
         this.async = async;
@@ -116,7 +120,7 @@ public class ObjectProxy<T> implements InvocationHandler, IAsyncObjectProxy {
                 log.debug(args[i].toString());
             }
         }
-        RPCFuture rpcFuture = this.consumer.sendRequest(requestRpcProtocol);
+        RPCFuture rpcFuture = this.consumer.sendRequest(requestRpcProtocol,registryService);
         return rpcFuture == null ? null : timeout > 0 ? rpcFuture.get(timeout, TimeUnit.MILLISECONDS) : rpcFuture.get();
     }
 
@@ -125,7 +129,7 @@ public class ObjectProxy<T> implements InvocationHandler, IAsyncObjectProxy {
         RpcProtocol<RpcRequest> request = createRequest(this.clazz.getName(), funcName, args);
         RPCFuture rpcFuture = null;
         try {
-            rpcFuture = this.consumer.sendRequest(request);
+            rpcFuture = this.consumer.sendRequest(request,registryService);
         } catch (Exception e) {
             log.error("async all throws exception:{}", e.getMessage());
         }

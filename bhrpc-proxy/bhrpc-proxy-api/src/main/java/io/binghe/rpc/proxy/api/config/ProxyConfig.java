@@ -1,6 +1,7 @@
 package io.binghe.rpc.proxy.api.config;
 
 import io.binghe.rpc.proxy.api.consumer.Consumer;
+import io.binghe.rpc.registry.api.RegistryService;
 
 import java.io.Serializable;
 
@@ -35,6 +36,8 @@ public class ProxyConfig<T> implements Serializable {
      */
     private long timeout;
 
+    private RegistryService registryService;
+
     /**
      * 消费者接口
      */
@@ -50,15 +53,27 @@ public class ProxyConfig<T> implements Serializable {
      */
     private boolean oneway;
 
-    public ProxyConfig(Class<T> clazz, String serviceVersion, String serviceGroup, String serializationType, long timeout, Consumer consumer, boolean async, boolean oneway) {
+    public ProxyConfig(Class<T> clazz, String serviceVersion, String serviceGroup, String serializationType, long timeout,
+                       RegistryService registryService, Consumer consumer, boolean async, boolean oneway) {
         this.clazz = clazz;
         this.serviceVersion = serviceVersion;
         this.serviceGroup = serviceGroup;
         this.serializationType = serializationType;
         this.timeout = timeout;
+        this.registryService = registryService;
         this.consumer = consumer;
         this.async = async;
         this.oneway = oneway;
+    }
+
+
+    public RegistryService getRegistryService() {
+        return registryService;
+    }
+
+    public ProxyConfig<T> setRegistryService(RegistryService registryService) {
+        this.registryService = registryService;
+        return this;
     }
 
     public Class<T> getClazz() {
