@@ -20,7 +20,7 @@ public class RpcConsumerNativeTest {
     @Before
     public void initRpcClient(){
         rpcClient = new RpcClient("127.0.0.1:3181","zookeeper","1.0.0",
-                "binghe","hessian2",3000,false,false);
+                "binghe","fst",3000,false,false);
     }
 
     @Test
