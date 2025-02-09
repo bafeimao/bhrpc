@@ -28,6 +28,11 @@
             <artifactId>protostuff-runtime</artifactId>
             <version>${protostuff.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.binghe.rpc</groupId>
+            <artifactId>bhrpc-serialization-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>
