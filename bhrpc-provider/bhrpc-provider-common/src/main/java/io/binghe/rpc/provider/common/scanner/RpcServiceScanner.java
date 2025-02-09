@@ -1,8 +1,10 @@
-package io.binghe.rpc.common.scanner.server;
+package io.binghe.rpc.provider.common.scanner;
 
 import io.binghe.rpc.annotation.RpcService;
 import io.binghe.rpc.common.helper.RpcServiceHelper;
 import io.binghe.rpc.common.scanner.ClassScanner;
+import io.binghe.rpc.protocol.meta.ServiceMeta;
+import io.binghe.rpc.registry.api.RegistryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,9 +19,9 @@ public class RpcServiceScanner extends ClassScanner {
     private static final Logger log = LoggerFactory.getLogger(RpcServiceScanner.class);
 
     public static Map<String, Object> doScannerWithRpcServiceAnnotationFilterAndRegistryService(
-            String scanPackage
-            //String host, int port,
-            // RegistryService registryService
+            String host, int port,
+            String scanPackage,
+            RegistryService registryService
     ) throws Exception {
         Map<String, Object> handlerMap = new HashMap<>();
         List<String> classNameList = getClassNameList(scanPackage, true);
@@ -32,9 +34,12 @@ public class RpcServiceScanner extends ClassScanner {
                 Class<?> clazz = Class.forName(className);
                 RpcService rpcService = clazz.getAnnotation(RpcService.class);
                 if (rpcService != null) {
-                    String serviceName = getServiceName(rpcService);
-                    String key = RpcServiceHelper.buildServiceKey(serviceName, rpcService.version(), rpcService.group());
-                    handlerMap.put(key, clazz.newInstance());
+                    ServiceMeta serviceMeta = new ServiceMeta(getServiceName(rpcService),
+                            rpcService.version(), rpcService.group(), host, port);
+                    registryService.register(serviceMeta);
+                    handlerMap.put(RpcServiceHelper.buildServiceKey(serviceMeta.getServiceName(),
+                                    serviceMeta.getServiceVersion(), serviceMeta.getServiceGroup()),
+                            clazz.newInstance());
                 }
             } catch (Exception e) {
                 log.error("scan classes throws exception:{}", e);

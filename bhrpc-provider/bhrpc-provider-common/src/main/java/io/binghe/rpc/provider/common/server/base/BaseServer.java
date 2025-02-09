@@ -4,6 +4,9 @@ import io.binghe.rpc.codec.RpcDecoder;
 import io.binghe.rpc.codec.RpcEncoder;
 import io.binghe.rpc.provider.common.handler.RpcProviderHandler;
 import io.binghe.rpc.provider.common.server.api.Server;
+import io.binghe.rpc.registry.api.RegistryService;
+import io.binghe.rpc.registry.api.config.RegistryConfig;
+import io.binghe.rpc.registry.zookeeper.ZookeeperRegistryService;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -12,8 +15,6 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.string.StringDecoder;
-import io.netty.handler.codec.string.StringEncoder;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,13 +37,27 @@ public class BaseServer implements Server {
 
     private String reflectType;
 
-    public BaseServer(String serverAddress,String reflectType) {
+    protected RegistryService registryService;
+
+    public BaseServer(String serverAddress, String registryAddress, String registryType, String reflectType) {
         if (!StringUtils.isEmpty(serverAddress)) {
             String[] array = serverAddress.split(":");
             host = array[0];
             port = Integer.parseInt(array[1]);
         }
         this.reflectType = reflectType;
+        this.registryService = getRegistryService(registryAddress, registryType);
+    }
+
+    private RegistryService getRegistryService(String registryAddress, String registryType) {
+        RegistryService registryService = null;
+        try {
+            registryService = new ZookeeperRegistryService();
+            registryService.init(new RegistryConfig(registryAddress, registryType));
+        } catch (Exception e) {
+            log.error("RPC Server error", e);
+        }
+        return registryService;
     }
 
     @Override
@@ -61,7 +76,7 @@ public class BaseServer implements Server {
                                     .pipeline()
                                     .addLast(new RpcDecoder())
                                     .addLast(new RpcEncoder())
-                                    .addLast(new RpcProviderHandler(reflectType,handlerMap));
+                                    .addLast(new RpcProviderHandler(reflectType, handlerMap));
                         }
                     })
                     .option(ChannelOption.SO_BACKLOG, 128)
