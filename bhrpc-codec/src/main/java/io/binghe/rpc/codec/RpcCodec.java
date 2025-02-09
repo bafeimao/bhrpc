@@ -2,12 +2,13 @@ package io.binghe.rpc.codec;
 
 import io.binghe.rpc.serialization.api.Serialization;
 import io.binghe.rpc.serialization.jdk.JdkSerialization;
+import io.binghe.rpc.spi.loader.ExtensionLoader;
 
 /**
  * @author You Chuande
  */
 public interface RpcCodec {
-    default Serialization getJdkSerialization() {
-        return new JdkSerialization();
+    default Serialization getJdkSerialization(String serializationType) {
+        return ExtensionLoader.getExtension(Serialization.class,serializationType);
     }
 }
