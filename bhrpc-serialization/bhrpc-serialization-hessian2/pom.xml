@@ -5,18 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>io.binghe.rpc</groupId>
-        <artifactId>bhrpc</artifactId>
+        <artifactId>bhrpc-serialization</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>bhrpc-serialization</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>bhrpc-serialization-api</module>
-        <module>bhrpc-serialization-jdk</module>
-        <module>bhrpc-serialization-json</module>
-        <module>bhrpc-serialization-hessian2</module>
-    </modules>
+    <artifactId>bhrpc-serialization-hessian2</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -26,13 +19,13 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.binghe.rpc</groupId>
-            <artifactId>bhrpc-serialization-api</artifactId>
-            <version>${project.version}</version>
+            <groupId>com.caucho</groupId>
+            <artifactId>hessian</artifactId>
+            <version>${hessian.version}</version>
         </dependency>
         <dependency>
             <groupId>io.binghe.rpc</groupId>
-            <artifactId>bhrpc-common</artifactId>
+            <artifactId>bhrpc-serialization-api</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
