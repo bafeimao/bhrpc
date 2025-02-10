@@ -17,6 +17,7 @@
         <module>bhrpc-proxy-cglib</module>
         <module>bhrpc-proxy-javassist</module>
         <module>bhrpc-proxy-bytebuddy</module>
+        <module>bhrpc-proxy-asm</module>
     </modules>
 
     <properties>
