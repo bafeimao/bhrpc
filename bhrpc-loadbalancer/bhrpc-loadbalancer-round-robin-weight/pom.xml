@@ -5,19 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>io.binghe.rpc</groupId>
-        <artifactId>bhrpc</artifactId>
+        <artifactId>bhrpc-loadbalancer</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>bhrpc-loadbalancer</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>bhrpc-loadbalancer-api</module>
-        <module>bhrpc-loadbalancer-random</module>
-        <module>bhrpc-loadbalancer-random-weight</module>
-        <module>bhrpc-loadbalancer-round-robin</module>
-        <module>bhrpc-loadbalancer-round-robin-weight</module>
-    </modules>
+    <artifactId>bhrpc-loadbalancer-round-robin-weight</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -28,7 +20,7 @@
     <dependencies>
         <dependency>
             <groupId>io.binghe.rpc</groupId>
-            <artifactId>bhrpc-spi</artifactId>
+            <artifactId>bhrpc-loadbalancer-api</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
