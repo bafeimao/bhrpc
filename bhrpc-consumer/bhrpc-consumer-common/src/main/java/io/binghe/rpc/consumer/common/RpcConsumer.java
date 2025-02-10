@@ -2,6 +2,7 @@ package io.binghe.rpc.consumer.common;
 
 import io.binghe.rpc.common.helper.RpcServiceHelper;
 import io.binghe.rpc.common.threadpool.ClientThreadPool;
+import io.binghe.rpc.common.utils.IpUtils;
 import io.binghe.rpc.consumer.common.handler.RpcConsumerHandler;
 import io.binghe.rpc.consumer.common.helper.RpcConsumerHandlerHelper;
 import io.binghe.rpc.consumer.common.initializer.RpcConsumerInitializer;
@@ -19,6 +20,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.net.util.IPAddressUtil;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,12 +32,14 @@ public class RpcConsumer implements Consumer {
     private final Logger log = LoggerFactory.getLogger(RpcConsumer.class);
     private final Bootstrap bootstrap;
     private final EventLoopGroup eventLoopGroup;
+    private final String localIp;
 
     private static volatile RpcConsumer instance;
 
     private static Map<String, RpcConsumerHandler> handlerMap = new ConcurrentHashMap<>();
 
     private RpcConsumer() {
+        localIp = IpUtils.getLocalHostIp();
         bootstrap = new Bootstrap();
         eventLoopGroup = new NioEventLoopGroup(4);
         bootstrap.group(eventLoopGroup)
@@ -66,7 +70,7 @@ public class RpcConsumer implements Consumer {
         String serviceKey = RpcServiceHelper.buildServiceKey(request.getClassName(), request.getVersion(), request.getGroup());
         Object[] params = request.getParameters();
         int invokeHashCode = (params == null || params.length == 0) ? serviceKey.hashCode() : params[0].hashCode();
-        ServiceMeta serviceMeta = registryService.discovery(serviceKey, invokeHashCode);
+        ServiceMeta serviceMeta = registryService.discovery(serviceKey, invokeHashCode,localIp);
         if (serviceMeta != null) {
             RpcConsumerHandler handler = RpcConsumerHandlerHelper.get(serviceMeta);
             if (handler == null) {

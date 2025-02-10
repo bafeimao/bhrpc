@@ -104,6 +104,11 @@ public class RpcConstants {
     public static final String SERIALIZATION_KRYO = "kryo";
 
     /**
+     * 随机负载均衡
+     */
+    public static final String SERVER_LOAD_BALANCER_RANDOM = "random";
+
+    /**
      * server load balance base on ZK
      */
     public static final String SERVER_LOAD_BALANCER_ZKCONSISTENTHASH = "zkconsistenthash";

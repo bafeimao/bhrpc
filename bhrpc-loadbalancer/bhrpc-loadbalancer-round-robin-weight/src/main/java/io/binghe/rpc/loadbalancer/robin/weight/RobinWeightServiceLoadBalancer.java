@@ -18,7 +18,7 @@ public class RobinWeightServiceLoadBalancer<T> implements ServiceLoadBalancer<T>
     private volatile AtomicInteger atomicInteger = new AtomicInteger(0);
 
     @Override
-    public T select(List<T> services, int hashCode) {
+    public T select(List<T> services, int hashCode, String sourceIp) {
         log.info("基于加权轮询算法的负载均衡策略");
         if (services == null || services.isEmpty()) {
             return null;

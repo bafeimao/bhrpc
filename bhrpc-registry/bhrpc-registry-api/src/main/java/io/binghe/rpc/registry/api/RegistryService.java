@@ -33,7 +33,7 @@ public interface RegistryService {
      * @return 服务元信息
      * @throws Exception 异常
      */
-    ServiceMeta discovery(String serviceName, int invokeHashCode) throws Exception;
+    ServiceMeta discovery(String serviceName, int invokeHashCode,String sourceIp) throws Exception;
 
     /**
      * 销毁

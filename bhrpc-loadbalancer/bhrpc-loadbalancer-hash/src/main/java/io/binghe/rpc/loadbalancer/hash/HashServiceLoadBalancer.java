@@ -15,7 +15,7 @@ public class HashServiceLoadBalancer<T> implements ServiceLoadBalancer<T> {
     private static final Logger log = LoggerFactory.getLogger(HashServiceLoadBalancer.class);
 
     @Override
-    public T select(List<T> services, int hashCode) {
+    public T select(List<T> services, int hashCode,String sourceIp) {
         log.info("基于hash的负载均衡策略");
         if (services == null || services.size() == 0) {
             return null;
