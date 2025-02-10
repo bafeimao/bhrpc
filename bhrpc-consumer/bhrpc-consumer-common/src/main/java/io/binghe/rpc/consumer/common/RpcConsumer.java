@@ -6,6 +6,7 @@ import io.binghe.rpc.common.utils.IpUtils;
 import io.binghe.rpc.consumer.common.handler.RpcConsumerHandler;
 import io.binghe.rpc.consumer.common.helper.RpcConsumerHandlerHelper;
 import io.binghe.rpc.consumer.common.initializer.RpcConsumerInitializer;
+import io.binghe.rpc.loadbalancer.context.ConnectionsContext;
 import io.binghe.rpc.protocol.RpcProtocol;
 import io.binghe.rpc.protocol.meta.ServiceMeta;
 import io.binghe.rpc.protocol.request.RpcRequest;
@@ -20,7 +21,6 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.net.util.IPAddressUtil;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -70,15 +70,15 @@ public class RpcConsumer implements Consumer {
         String serviceKey = RpcServiceHelper.buildServiceKey(request.getClassName(), request.getVersion(), request.getGroup());
         Object[] params = request.getParameters();
         int invokeHashCode = (params == null || params.length == 0) ? serviceKey.hashCode() : params[0].hashCode();
-        ServiceMeta serviceMeta = registryService.discovery(serviceKey, invokeHashCode,localIp);
+        ServiceMeta serviceMeta = registryService.discovery(serviceKey, invokeHashCode, localIp);
         if (serviceMeta != null) {
             RpcConsumerHandler handler = RpcConsumerHandlerHelper.get(serviceMeta);
             if (handler == null) {
-                handler = getRpcConsumerHandler(serviceMeta.getServiceAddr(), serviceMeta.getServicePort());
+                handler = getRpcConsumerHandler(serviceMeta);
                 RpcConsumerHandlerHelper.put(serviceMeta, handler);
             } else if (!handler.getChannel().isActive()) {
                 handler.close();
-                handler = getRpcConsumerHandler(serviceMeta.getServiceAddr(), serviceMeta.getServicePort());
+                handler = getRpcConsumerHandler(serviceMeta);
                 RpcConsumerHandlerHelper.put(serviceMeta, handler);
             }
             return handler.sendRequest(protocol, request.getAsync(), request.getOneway());
@@ -89,13 +89,14 @@ public class RpcConsumer implements Consumer {
     /**
      * 创建链接并返回RpcClientHandler
      */
-    private RpcConsumerHandler getRpcConsumerHandler(String serviceAddress, int port) throws InterruptedException {
-        ChannelFuture future = bootstrap.connect(serviceAddress, port).sync();
+    private RpcConsumerHandler getRpcConsumerHandler(ServiceMeta serviceMeta) throws InterruptedException {
+        ChannelFuture future = bootstrap.connect(serviceMeta.getServiceAddr(), serviceMeta.getServicePort()).sync();
         future.addListener((ChannelFutureListener) listener -> {
             if (future.isSuccess()) {
-                log.info("connect rpc server {} on port {} success", serviceAddress, port);
+                ConnectionsContext.add(serviceMeta);
+                log.info("connect rpc server {} on port {} success", serviceMeta.getServiceAddr(), serviceMeta.getServicePort());
             } else {
-                log.error("connect rpc server {} on port {} failed", serviceAddress, port);
+                log.error("connect rpc server {} on port {} failed", serviceMeta.getServiceAddr(), serviceMeta.getServicePort());
                 future.cause().printStackTrace();
                 eventLoopGroup.shutdownGracefully();
             }
