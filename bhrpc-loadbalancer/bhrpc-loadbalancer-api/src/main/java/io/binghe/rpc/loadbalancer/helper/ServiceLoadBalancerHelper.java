@@ -37,7 +37,7 @@ public class ServiceLoadBalancerHelper {
             ServiceMeta serviceMeta = new ServiceMeta();
             serviceMeta.setServiceAddr(serviceInstance.getIp());
             serviceMeta.setServicePort(serviceInstance.getPort());
-            serviceMeta.setServiceName(metadata.get("serviceName"));
+            serviceMeta.setServiceName(serviceInstance.getServiceName());
             serviceMeta.setServiceVersion(metadata.get("serviceVersion"));
             serviceMeta.setServiceGroup(metadata.get("serviceGroup"));
             serviceMeta.setWeight(Integer.parseInt(metadata.get("weight")));

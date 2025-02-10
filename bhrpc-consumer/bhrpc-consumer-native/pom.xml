@@ -28,6 +28,11 @@
             <artifactId>bhrpc-registry-zookeeper</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.binghe.rpc</groupId>
+            <artifactId>bhrpc-registry-nacos</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>
