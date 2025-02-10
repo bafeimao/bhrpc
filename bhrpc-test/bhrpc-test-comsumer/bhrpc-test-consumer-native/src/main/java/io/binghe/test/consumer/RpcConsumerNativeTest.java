@@ -18,16 +18,16 @@ public class RpcConsumerNativeTest {
     private RpcClient rpcClient;
 
     @Before
-    public void initRpcClient(){
-        rpcClient = new RpcClient("127.0.0.1:3181","zookeeper","1.0.0",
-                "binghe","protostuff",3000,false,false);
+    public void initRpcClient() {
+        rpcClient = new RpcClient("127.0.0.1:2181", "zookeeper", "1.0.0",
+                "jdk", "binghe", "protostuff", 3000, false, false);
     }
 
     @Test
-    public void testInterfaceRpc(){
+    public void testInterfaceRpc() {
         DemoService demoService = rpcClient.create(DemoService.class);
         String result = demoService.hello("binghe");
-        log.info("返回的结果数据===>>>>>:{}",result);
+        log.info("返回的结果数据===>>>>>:{}", result);
         rpcClient.shutdown();
     }
 

@@ -1,10 +1,12 @@
 package io.binghe.rpc.proxy.api;
 
 import io.binghe.rpc.proxy.api.config.ProxyConfig;
+import io.binghe.rpc.spi.annotation.SPI;
 
 /**
  * @author You Chuande
  */
+@SPI
 public interface ProxyFactory {
     /**
      * 获取代理对象
