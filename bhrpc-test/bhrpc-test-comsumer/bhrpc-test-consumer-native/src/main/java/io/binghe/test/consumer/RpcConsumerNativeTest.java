@@ -20,7 +20,7 @@ public class RpcConsumerNativeTest {
     @Before
     public void initRpcClient() {
         rpcClient = new RpcClient("127.0.0.1:3181", "zookeeper",
-                "enhanced_iphashweight", "1.0.0",
+                "enhanced_zkconsistenthash", "1.0.0",
                 "cglib", "binghe", "protostuff", 3000, false, false);
     }
 
