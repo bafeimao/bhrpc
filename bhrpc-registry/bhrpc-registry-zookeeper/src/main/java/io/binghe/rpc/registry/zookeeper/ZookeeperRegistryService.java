@@ -46,9 +46,10 @@ public class ZookeeperRegistryService implements RegistryService {
                 .serializer(serializer)
                 .build();
         this.serviceDiscovery.start();
-        this.serviceLoadBalancer = ExtensionLoader.getExtension(ServiceLoadBalancer.class, registryConfig.getRegistryLoadBalancerType());
         if (registryConfig.getRegistryLoadBalancerType().toLowerCase().contains(RpcConstants.SERVICE_ENHANCED_LOAD_BALANCER_PREFIX)) {
             this.serviceEnhancedLoadBalancer = ExtensionLoader.getExtension(ServiceLoadBalancer.class, registryConfig.getRegistryLoadBalancerType());
+        }else {
+            this.serviceLoadBalancer = ExtensionLoader.getExtension(ServiceLoadBalancer.class, registryConfig.getRegistryLoadBalancerType());
         }
     }
 
@@ -65,14 +66,15 @@ public class ZookeeperRegistryService implements RegistryService {
             return getServiceMetaInstance(invokeHashCode, sourceIp,
                     (List<ServiceInstance<ServiceMeta>>) serviceInstances);
         }
-        return this.serviceEnhancedLoadBalancer.select(ServiceLoadBalancerHelper.getServiceMetaList((List<ServiceInstance<ServiceMeta>>) serviceInstances),
+        return this.serviceEnhancedLoadBalancer.select(ServiceLoadBalancerHelper.getServiceMetaList(
+                (List<ServiceInstance<ServiceMeta>>) serviceInstances),
                 invokeHashCode, sourceIp);
     }
 
     private ServiceMeta getServiceMetaInstance(int invokeHashCode, String sourceIp,
                                                List<ServiceInstance<ServiceMeta>> serviceInstances) {
         ServiceInstance<ServiceMeta> instance =
-                serviceLoadBalancer.select((List<ServiceInstance<ServiceMeta>>) serviceInstances, invokeHashCode, sourceIp);
+                this.serviceLoadBalancer.select(serviceInstances, invokeHashCode, sourceIp);
         if (instance != null) {
             return instance.getPayload();
         }

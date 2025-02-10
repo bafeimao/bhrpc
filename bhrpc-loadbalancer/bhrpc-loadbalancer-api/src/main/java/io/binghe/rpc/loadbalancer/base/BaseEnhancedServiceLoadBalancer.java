@@ -17,7 +17,7 @@ public abstract class BaseEnhancedServiceLoadBalancer implements ServiceLoadBala
             return null;
         }
         List<ServiceMeta> serviceMetaList = new ArrayList<>();
-        servers.forEach((server -> {
+        servers.stream().forEach((server -> {
             IntStream.range(0, server.getWeight()).forEach((i) -> {
                 serviceMetaList.add(server);
             });
