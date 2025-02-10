@@ -92,7 +92,7 @@ public class RpcClient {
         if (StringUtils.isEmpty(registryType)) {
             throw new IllegalArgumentException("registryType is null");
         }
-        RegistryService registryService = new ZookeeperRegistryService();
+        RegistryService registryService = ExtensionLoader.getExtension(RegistryService.class,registryType);
         try {
             registryService.init(new RegistryConfig(registryAddress, registryType, registryLoadBalanceType));
         } catch (Exception e) {

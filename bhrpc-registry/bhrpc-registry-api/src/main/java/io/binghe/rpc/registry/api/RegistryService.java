@@ -2,12 +2,14 @@ package io.binghe.rpc.registry.api;
 
 import io.binghe.rpc.protocol.meta.ServiceMeta;
 import io.binghe.rpc.registry.api.config.RegistryConfig;
+import io.binghe.rpc.spi.annotation.SPI;
 
 import java.io.IOException;
 
 /**
  * @author You Chuande
  */
+@SPI
 public interface RegistryService {
     /**
      * 服务注册
@@ -33,7 +35,7 @@ public interface RegistryService {
      * @return 服务元信息
      * @throws Exception 异常
      */
-    ServiceMeta discovery(String serviceName, int invokeHashCode,String sourceIp) throws Exception;
+    ServiceMeta discovery(String serviceName, int invokeHashCode, String sourceIp) throws Exception;
 
     /**
      * 销毁

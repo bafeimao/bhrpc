@@ -8,6 +8,7 @@ import io.binghe.rpc.loadbalancer.random.RandomServiceLoadBalancer;
 import io.binghe.rpc.protocol.meta.ServiceMeta;
 import io.binghe.rpc.registry.api.RegistryService;
 import io.binghe.rpc.registry.api.config.RegistryConfig;
+import io.binghe.rpc.spi.annotation.SPIClass;
 import io.binghe.rpc.spi.loader.ExtensionLoader;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -26,6 +27,7 @@ import java.util.Random;
 /**
  * @author You Chuande
  */
+@SPIClass
 public class ZookeeperRegistryService implements RegistryService {
     public static final int BASE_SLEEP_TIME_MS = 1000;
     public static final int MAX_RETRIES = 3;
