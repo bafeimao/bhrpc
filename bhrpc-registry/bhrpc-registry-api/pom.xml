@@ -24,6 +24,11 @@
             <artifactId>bhrpc-protocol</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.binghe.rpc</groupId>
+            <artifactId>bhrpc-loadbalancer-random-weight</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>
