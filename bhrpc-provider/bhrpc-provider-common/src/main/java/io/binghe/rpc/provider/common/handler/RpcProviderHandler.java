@@ -9,6 +9,8 @@ import io.binghe.rpc.protocol.enumeration.RpcType;
 import io.binghe.rpc.protocol.header.RpcHeader;
 import io.binghe.rpc.protocol.request.RpcRequest;
 import io.binghe.rpc.protocol.response.RpcResponse;
+import io.binghe.rpc.reflect.api.ReflectInvoker;
+import io.binghe.rpc.spi.loader.ExtensionLoader;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import net.sf.cglib.reflect.FastClass;
@@ -26,11 +28,11 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocol<
     private final Logger log = LoggerFactory.getLogger(RpcProviderHandler.class);
     private final Map<String, Object> handlerMap;
     //调用采用哪种类型调用真实方法
-    private final String reflectType;
+    private ReflectInvoker reflectInvoker;
 
     public RpcProviderHandler(String reflectType, Map<String, Object> handlerMap) {
-        this.reflectType = reflectType;
         this.handlerMap = handlerMap;
+        this.reflectInvoker = ExtensionLoader.getExtension(ReflectInvoker.class, reflectType);
     }
 
     @Override
@@ -67,34 +69,7 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocol<
         String methodName = request.getMethodName();
         Class<?>[] parameterTypes = request.getParameterTypes();
         Object[] parameters = request.getParameters();
-        return this.invokeMethod(serviceBean, serviceClass, methodName, parameterTypes, parameters);
-    }
-
-    private Object invokeMethod(Object serviceBean, Class<?> serviceClass, String methodName, Class<?>[] parameterType, Object[] parameters) throws Exception {
-        switch (this.reflectType) {
-            case RpcConstants.REFLECT_TYPE_JDK:
-                return this.invokeJDKMethod(serviceBean, serviceClass, methodName, parameterType, parameters);
-            case RpcConstants.REFLECT_TYPE_CGLIB:
-                return this.invokeCGLib(serviceBean, serviceClass, methodName, parameterType, parameters);
-            default:
-                throw new IllegalArgumentException("not support reflect type: " + this.reflectType);
-        }
-    }
-
-    private Object invokeJDKMethod(Object serviceBean, Class<?> serviceClass, String methodName, Class<?>[] parameterType, Object[] parameters) throws Exception {
-        //jdk reflect
-        log.info("use jdk reflect type invoke method");
-        Method method = serviceClass.getMethod(methodName, parameterType);
-        method.setAccessible(true);
-        return method.invoke(serviceBean, parameters);
-    }
-
-    private Object invokeCGLib(Object serviceBean, Class<?> serviceClass, String methodName, Class<?>[] parameterType, Object[] parameters) throws Exception {
-        //cglib reflect
-        log.info("use cglib reflect type invoke method");
-        FastClass serviceFastClass = FastClass.create(serviceClass);
-        FastMethod serviceFastMethod = serviceFastClass.getMethod(methodName, parameterType);
-        return serviceFastMethod.invoke(serviceBean, parameters);
+        return this.reflectInvoker.invokeMethod(serviceBean, serviceClass, methodName, parameterTypes, parameters);
     }
 
 
