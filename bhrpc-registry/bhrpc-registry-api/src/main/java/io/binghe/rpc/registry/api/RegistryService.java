@@ -42,7 +42,7 @@ public interface RegistryService {
      *
      * @throws IOException 异常
      */
-    void destroy() throws IOException;
+    void destroy() throws Exception;
 
     /**
      * 默认初始化方法

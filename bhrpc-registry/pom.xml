@@ -20,6 +20,15 @@
     <modules>
         <module>bhrpc-registry-api</module>
         <module>bhrpc-registry-zookeeper</module>
+        <module>bhrpc-registry-nacos</module>
     </modules>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.binghe.rpc</groupId>
+            <artifactId>bhrpc-spi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 
 </project>

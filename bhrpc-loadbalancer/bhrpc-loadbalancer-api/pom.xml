@@ -49,6 +49,11 @@
             <artifactId>curator-x-discovery</artifactId>
             <version>${curator.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.alibaba.nacos</groupId>
+            <artifactId>nacos-client</artifactId>
+            <version>${nacos.version}</version>
+        </dependency>
     </dependencies>
 
 </project>
