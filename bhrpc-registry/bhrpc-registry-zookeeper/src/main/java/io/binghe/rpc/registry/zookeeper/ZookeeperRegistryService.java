@@ -6,6 +6,7 @@ import io.binghe.rpc.loadbalancer.random.RandomServiceLoadBalancer;
 import io.binghe.rpc.protocol.meta.ServiceMeta;
 import io.binghe.rpc.registry.api.RegistryService;
 import io.binghe.rpc.registry.api.config.RegistryConfig;
+import io.binghe.rpc.spi.loader.ExtensionLoader;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
@@ -42,7 +43,7 @@ public class ZookeeperRegistryService implements RegistryService {
                 .serializer(serializer)
                 .build();
         this.serviceDiscovery.start();
-        this.serviceLoadBalancer = new RandomServiceLoadBalancer<>();
+        this.serviceLoadBalancer = ExtensionLoader.getExtension(ServiceLoadBalancer.class, registryConfig.getRegistryLoadBalancerType());
     }
 
     @Override

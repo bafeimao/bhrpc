@@ -1,10 +1,14 @@
 package io.binghe.rpc.loadbalancer.api;
 
+import io.binghe.rpc.spi.annotation.SPI;
+
 import java.util.List;
 
 /**
  * @author You Chuande
  */
+
+@SPI
 public interface ServiceLoadBalancer<T> {
     /**
      * 以负载均衡的方式选择一个服务节点

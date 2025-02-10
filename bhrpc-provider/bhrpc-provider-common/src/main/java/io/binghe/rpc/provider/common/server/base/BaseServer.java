@@ -39,21 +39,21 @@ public class BaseServer implements Server {
 
     protected RegistryService registryService;
 
-    public BaseServer(String serverAddress, String registryAddress, String registryType, String reflectType) {
+    public BaseServer(String serverAddress, String registryAddress, String registryType,String registryLoadBalanceType, String reflectType) {
         if (!StringUtils.isEmpty(serverAddress)) {
             String[] array = serverAddress.split(":");
             host = array[0];
             port = Integer.parseInt(array[1]);
         }
         this.reflectType = reflectType;
-        this.registryService = getRegistryService(registryAddress, registryType);
+        this.registryService = getRegistryService(registryAddress, registryType, registryLoadBalanceType);
     }
 
-    private RegistryService getRegistryService(String registryAddress, String registryType) {
+    private RegistryService getRegistryService(String registryAddress, String registryType, String registryLoadBalanceType) {
         RegistryService registryService = null;
         try {
             registryService = new ZookeeperRegistryService();
-            registryService.init(new RegistryConfig(registryAddress, registryType));
+            registryService.init(new RegistryConfig(registryAddress, registryType,registryLoadBalanceType));
         } catch (Exception e) {
             log.error("RPC Server error", e);
         }
