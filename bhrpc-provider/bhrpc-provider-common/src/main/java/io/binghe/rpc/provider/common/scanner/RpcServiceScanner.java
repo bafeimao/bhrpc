@@ -3,6 +3,7 @@ package io.binghe.rpc.provider.common.scanner;
 import io.binghe.rpc.annotation.RpcService;
 import io.binghe.rpc.common.helper.RpcServiceHelper;
 import io.binghe.rpc.common.scanner.ClassScanner;
+import io.binghe.rpc.constants.RpcConstants;
 import io.binghe.rpc.protocol.meta.ServiceMeta;
 import io.binghe.rpc.registry.api.RegistryService;
 import org.slf4j.Logger;
@@ -35,7 +36,7 @@ public class RpcServiceScanner extends ClassScanner {
                 RpcService rpcService = clazz.getAnnotation(RpcService.class);
                 if (rpcService != null) {
                     ServiceMeta serviceMeta = new ServiceMeta(getServiceName(rpcService),
-                            rpcService.version(), rpcService.group(), host, port);
+                            rpcService.version(), rpcService.group(), host, port, getWeight(rpcService.weight()));
                     registryService.register(serviceMeta);
                     handlerMap.put(RpcServiceHelper.buildServiceKey(serviceMeta.getServiceName(),
                                     serviceMeta.getServiceVersion(), serviceMeta.getServiceGroup()),
@@ -58,5 +59,15 @@ public class RpcServiceScanner extends ClassScanner {
             serviceName = rpcService.interfaceClassName();
         }
         return serviceName;
+    }
+
+    public static int getWeight(int weight) {
+        if (weight < RpcConstants.SERVICE_WEIGHT_MIN) {
+            return RpcConstants.SERVICE_WEIGHT_MIN;
+        }
+        if (weight > RpcConstants.SERVICE_WEIGHT_MAX) {
+            return RpcConstants.SERVICE_WEIGHT_MAX;
+        }
+        return weight;
     }
 }

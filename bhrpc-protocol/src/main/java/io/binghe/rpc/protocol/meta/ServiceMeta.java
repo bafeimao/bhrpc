@@ -32,15 +32,22 @@ public class ServiceMeta implements Serializable {
      */
     private String serviceGroup;
 
+    /**
+     * 权重
+     */
+    private int weight;
+
     public ServiceMeta() {
     }
 
-    public ServiceMeta(String serviceName, String serviceVersion, String serviceGroup, String serviceAddr, int servicePort) {
+    public ServiceMeta(String serviceName, String serviceVersion, String serviceGroup, String serviceAddr, int servicePort
+            , int weight) {
         this.serviceName = serviceName;
         this.serviceVersion = serviceVersion;
         this.serviceAddr = serviceAddr;
         this.servicePort = servicePort;
         this.serviceGroup = serviceGroup;
+        this.weight = weight;
     }
 
     public String getServiceName() {
@@ -85,6 +92,15 @@ public class ServiceMeta implements Serializable {
 
     public ServiceMeta setServiceGroup(String serviceGroup) {
         this.serviceGroup = serviceGroup;
+        return this;
+    }
+
+    public int getWeight() {
+        return weight;
+    }
+
+    public ServiceMeta setWeight(int weight) {
+        this.weight = weight;
         return this;
     }
 }
