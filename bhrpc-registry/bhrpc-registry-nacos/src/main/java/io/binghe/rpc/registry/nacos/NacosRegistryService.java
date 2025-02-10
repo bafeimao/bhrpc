@@ -78,7 +78,7 @@ public class NacosRegistryService implements RegistryService {
         Map<String, String> metadata = getMetaDataByServiceMeta(serviceMeta);
         instance.setMetadata(metadata);
         namingService.deregisterInstance(RpcServiceHelper.buildServiceKey(serviceMeta.getServiceName(),
-                serviceMeta.getServiceVersion(), serviceMeta.getServiceGroup()), serviceMeta.getServiceGroup(), instance);
+                serviceMeta.getServiceVersion(), serviceMeta.getServiceGroup()), instance);
     }
 
     @Override
