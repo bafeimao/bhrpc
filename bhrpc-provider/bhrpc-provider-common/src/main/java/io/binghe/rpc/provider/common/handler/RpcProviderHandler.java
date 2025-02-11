@@ -11,14 +11,12 @@ import io.binghe.rpc.protocol.request.RpcRequest;
 import io.binghe.rpc.protocol.response.RpcResponse;
 import io.binghe.rpc.reflect.api.ReflectInvoker;
 import io.binghe.rpc.spi.loader.ExtensionLoader;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import net.sf.cglib.reflect.FastClass;
-import net.sf.cglib.reflect.FastMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
@@ -38,26 +36,60 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocol<
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, RpcProtocol<RpcRequest> protocol) throws Exception {
         ServerThreadPool.submit(() -> {
-            RpcHeader header = protocol.getHeader();
-            header.setMsgType((byte) RpcType.RESPONSE.getType());
-            RpcRequest request = protocol.getBody();
-            RpcProtocol<RpcResponse> responseProtocol = new RpcProtocol<>();
-            RpcResponse response = new RpcResponse();
-            try {
-                Object result = this.handle(request);
-                response.setResult(result);
-                response.setAsync(request.getAsync());
-                response.setOneway(request.getOneway());
-                header.setStatus((byte) RpcStatus.SUCCESS.getCode());
-            } catch (Throwable e) {
-                response.setError(e.toString());
-                header.setStatus((byte) RpcStatus.FAIL.getCode());
-            }
-            responseProtocol.setHeader(header);
-            responseProtocol.setBody(response);
-            channelHandlerContext.writeAndFlush(responseProtocol);
+            RpcProtocol<RpcResponse> responseRpcProtocol = handleMessage(protocol);
+            channelHandlerContext.writeAndFlush(responseRpcProtocol)
+                    .addListener((ChannelFutureListener) channelFuture ->
+                            log.info("Send response for request " + protocol.getHeader().getRequestId()));
         });
     }
+
+    private RpcProtocol<RpcResponse> handleMessage(RpcProtocol<RpcRequest> protocol) {
+        RpcProtocol<RpcResponse> responseRpcProtocol = null;
+        RpcHeader header = protocol.getHeader();
+        if (header.getMsgType() == (byte) RpcType.HEARTBEAT.getType()) {
+            responseRpcProtocol = handleHeartBeatMessage(protocol, header);
+        } else if (header.getMsgType() == (byte) RpcType.REQUEST.getType()) {
+            responseRpcProtocol = handleRequestMessage(protocol, header);
+        }
+        return responseRpcProtocol;
+    }
+
+    private RpcProtocol<RpcResponse> handleHeartBeatMessage(RpcProtocol<RpcRequest> protocol, RpcHeader header) {
+        header.setMsgType((byte) RpcType.HEARTBEAT.getType());
+        RpcRequest request = protocol.getBody();
+        RpcProtocol<RpcResponse> responseRpcProtocol = new RpcProtocol<>();
+        RpcResponse response = new RpcResponse();
+        response.setResult(RpcConstants.HEARTBEAT_PONG);
+        response.setAsync(request.getAsync());
+        response.setOneway(request.getOneway());
+        header.setStatus((byte) RpcStatus.SUCCESS.getCode());
+        responseRpcProtocol.setHeader(header);
+        responseRpcProtocol.setBody(response);
+        return responseRpcProtocol;
+    }
+
+    private RpcProtocol<RpcResponse> handleRequestMessage(RpcProtocol<RpcRequest> protocol, RpcHeader header) {
+        header.setMsgType((byte) RpcType.RESPONSE.getType());
+        RpcRequest request = protocol.getBody();
+        log.debug("Receive request: {}", header.getRequestId());
+        RpcProtocol<RpcResponse> responseRpcProtocol = new RpcProtocol<>();
+        RpcResponse response = new RpcResponse();
+        try {
+            Object result = handle(request);
+            response.setResult(result);
+            response.setAsync(request.getAsync());
+            response.setOneway(request.getOneway());
+            header.setStatus((byte) RpcStatus.SUCCESS.getCode());
+        } catch (Throwable t) {
+            header.setStatus((byte) RpcStatus.FAIL.getCode());
+            response.setError(t.toString());
+            log.error("RPC Server handle request error", t);
+        }
+        responseRpcProtocol.setHeader(header);
+        responseRpcProtocol.setBody(response);
+        return responseRpcProtocol;
+    }
+
 
     private Object handle(RpcRequest request) throws Throwable {
         String serviceKey = RpcServiceHelper.buildServiceKey(request.getClassName(), request.getVersion(), request.getGroup());

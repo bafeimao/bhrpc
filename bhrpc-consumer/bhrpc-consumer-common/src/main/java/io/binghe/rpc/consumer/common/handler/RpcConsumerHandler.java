@@ -3,12 +3,16 @@ package io.binghe.rpc.consumer.common.handler;
 import com.alibaba.fastjson2.JSONObject;
 import io.binghe.rpc.consumer.common.context.RpcContext;
 import io.binghe.rpc.protocol.RpcProtocol;
+import io.binghe.rpc.protocol.enumeration.RpcType;
 import io.binghe.rpc.protocol.header.RpcHeader;
 import io.binghe.rpc.protocol.request.RpcRequest;
 import io.binghe.rpc.protocol.response.RpcResponse;
 import io.binghe.rpc.proxy.api.future.RPCFuture;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,12 +57,28 @@ public class RpcConsumerHandler extends SimpleChannelInboundHandler<RpcProtocol<
         if (msg == null) {
             return;
         }
-        log.info("服务消费者接收到的数据===>>>{}", JSONObject.toJSONString(msg));
-        RpcHeader header = msg.getHeader();
+        this.handleMessage(msg);
+    }
+
+    private void handleMessage(RpcProtocol<RpcResponse> protocol) {
+        RpcHeader header = protocol.getHeader();
+        //心跳消息
+        if (header.getMsgType() == (byte) RpcType.HEARTBEAT.getType()) {
+            this.handleHeartBeatMessage(protocol);
+        } else if (header.getMsgType() == (byte) RpcType.RESPONSE.getType()) {
+            this.handleResponseMessage(protocol, header);
+        }
+    }
+
+    private void handleHeartBeatMessage(RpcProtocol<RpcResponse> protocol) {
+        log.info("接收到服务提供者的心跳消息===>>>{}", protocol.getBody().getResult());
+    }
+
+    private void handleResponseMessage(RpcProtocol<RpcResponse> protocol, RpcHeader header) {
         long requestId = header.getRequestId();
         RPCFuture rpcFuture = pendingRpc.remove(requestId);
         if (rpcFuture != null) {
-            rpcFuture.done(msg);
+            rpcFuture.done(protocol);
         }
     }
 

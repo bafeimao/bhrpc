@@ -127,4 +127,15 @@ public class RpcConstants {
      */
     public static final int SERVICE_WEIGHT_MAX = 100;
 
+    /**
+     * 心跳ping消息
+     */
+    public static final String HEARTBEAT_PING = "ping";
+
+    /**
+     * 心跳pong消息
+     */
+    public static final String HEARTBEAT_PONG = "pong";
+
+
 }
